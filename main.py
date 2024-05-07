@@ -2,28 +2,33 @@ from pypdf import PdfReader
 import re
 import os
 
+#get the current dirtectory path
 dir_list = os.listdir(os.getcwd())
-
-pdfs= []
-strings = []
 total = 0
 
-for file in dir_list:
-  if file.endswith(".pdf"):
-    reader = PdfReader(file) 
-    page = reader.pages[0]  
-    text = page.extract_text() 
-    index = text.find("Total payable ")
-    new_text = text[index:index + 30]
-    pdfs.append(new_text)
+def addInvoices():
+  global total
+  #search all invoices and adds all prices to a list
+  for file in dir_list:
+    if file.endswith(".pdf"):
+      #find the price
+      reader = PdfReader(file) 
+      page = reader.pages[0]  
+      text = page.extract_text() 
+      index = text.find("Total payable ")
+      new_text = text[index:index + 30]
+      x = re.findall("\d+\.\d+",new_text)
 
-for i in pdfs:
-  x = re.findall("\d+\.\d+",i)
-  strings.append(x[0])
+      #convert it to float from string
+      num = float(x[0])
+      total += num
 
-for j in range (0, len(strings)):
-  total += float(strings[j])  
+  return total
+
+
 
 print()
-print("The total amount for the invoices: ",round(total, 2))
+print()
+print("The total amount of the invoices is: ", addInvoices())
+print()
 print()
